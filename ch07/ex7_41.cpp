@@ -1,16 +1,31 @@
 #include <iostream>
 #include <string>
-struct Sales_data;
+class Sales_data;
 std::istream& read(std::istream &in, Sales_data &item);
-struct Sales_data{
-    Sales_data() = default;
-    Sales_data(const std::string&s) :bookNo(s) {}
-    Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(n*p){ }
+class Sales_data{
+    friend Sales_data& Sales_data::combine(const Sales_data &input);
+    friend std::istream& read(std::istream &in, Sales_data &item);
+    friend std::ostream& print(std::ostream &out, const Sales_data &item);
+public:
+    Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(n*p)
+    {
+        std::cout << "Sales_data(const std::string&, unsigned, double)" << std::endl;
+    }
+    Sales_data() : Sales_data("", 0, 0.0f)
+    {
+        std::cout << "Sales_data()" << std::endl;
+    }
+    Sales_data(const std::string &s) : Sales_data(s, 0, 0.0f)
+    {
+        std::cout << "Sales_data(const std::string&)" << std::endl;
+    }
     Sales_data(std::istream &is) { read(is, *this); }
 
     std::string isbn() const { return bookNo; }
     Sales_data& combine(const Sales_data &input);
+    double avg_price(){ return units_sold ? (revenue / units_sold) : 0; }
 
+private:
     std::string bookNo;
     unsigned units_sold = 0;
     double revenue = 0.0;
@@ -41,29 +56,8 @@ Sales_data add(const Sales_data &lhs, const Sales_data &rhs)
     sum.combine(rhs);
     return sum;
 }
+
 int main()
 {
-    std::istream &is = std::cin;
-    Sales_data total(is);
-    if (is)
-    {
-        while (is)
-        {
-            Sales_data trans(is);
-            if (!is) break;
-            if (total.isbn() == trans.isbn())
-                total.combine(trans);
-            else
-            {
-                print(std::cout, total) << std::endl;
-                total = trans;
-            }
-        }
-        print(std::cout, total) << std::endl;
-    }
-    else
-    {
-        std::cerr << "No data!" << std::endl;
-    }
     return 0;
 }
