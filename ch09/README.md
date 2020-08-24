@@ -763,3 +763,136 @@ iter += 2;
 
 循环永远不会结束。`++iter;`语句不在while语句中。
 
+
+
+## 练习9.35
+
+> 解释一个`vector`的`capacity`和`size`有何区别。
+
+`capacity`的值表明，在不重新分配内存空间的情况下，容器可以保存多少元素
+
+而`size`的值是指容器已经保存的元素的数量
+
+
+
+## 练习9.36
+
+> 一个容器的`capacity`可能小于它的`size`吗？
+
+不可能。
+
+
+
+## 练习9.37
+
+> 为什么`list`或`array`没有`capacity`成员函数？
+
+因为`list`是链表，而`array`不允许改变容器大小。
+
+
+
+## 练习9.38
+
+> 编写程序，探究在你的标准实现中，`vector`是如何增长的。
+
+```C++
+#include <iostream>
+#include <string>
+#include <vector>
+int main()
+{
+    std::vector<int> v;
+    for (int i = 0; i < 50; i++)
+    {
+        std::cout << "capacity: " << v.capacity() << "  size: " << v.size() << std::endl;
+        v.push_back(i);
+    }
+    return 0;
+}
+```
+
+运行结果：
+
+> capacity: 0  size: 0
+> capacity: 1  size: 1
+> capacity: 2  size: 2
+> capacity: 3  size: 3
+> capacity: 4  size: 4
+> capacity: 6  size: 5
+> capacity: 6  size: 6
+> capacity: 9  size: 7
+> capacity: 9  size: 8
+> capacity: 9  size: 9
+> capacity: 13  size: 10
+> capacity: 13  size: 11
+> capacity: 13  size: 12
+> capacity: 13  size: 13
+> capacity: 19  size: 14
+> capacity: 19  size: 15
+> capacity: 19  size: 16
+> capacity: 19  size: 17
+> capacity: 19  size: 18
+> capacity: 19  size: 19
+> capacity: 28  size: 20
+> capacity: 28  size: 21
+> capacity: 28  size: 22
+> capacity: 28  size: 23
+> capacity: 28  size: 24
+> capacity: 28  size: 25
+> capacity: 28  size: 26
+> capacity: 28  size: 27
+> capacity: 28  size: 28
+> capacity: 42  size: 29
+> capacity: 42  size: 30
+> capacity: 42  size: 31
+> capacity: 42  size: 32
+> capacity: 42  size: 33
+> capacity: 42  size: 34
+> capacity: 42  size: 35
+> capacity: 42  size: 36
+> capacity: 42  size: 37
+> capacity: 42  size: 38
+> capacity: 42  size: 39
+> capacity: 42  size: 40
+> capacity: 42  size: 41
+> capacity: 42  size: 42
+> capacity: 63  size: 43
+> capacity: 63  size: 44
+> capacity: 63  size: 45
+> capacity: 63  size: 46
+> capacity: 63  size: 47
+> capacity: 63  size: 48
+> capacity: 63  size: 49
+> 请按任意键继续. . .
+
+
+
+## 练习9.39
+
+> 解释下面程序片段做了什么：
+>
+> ```C++
+> vector<string> svec;
+> svec.reserve(1024);
+> string word;
+> while (cin >> word)
+> 	svec.push_back(word);
+> svec.resize(svec.size() + svec.size() / 2);
+> ```
+
+定义一个`vector`，为它分配1024个元素的空间。然后通过一个循环从标准输入中读取字符串并添加到`vector`当中。循环结束后，改变`vector`的容器大小（元素数量）为原来的1.5倍，使用元素的默认初始化值填充。如果容器的大小超过1024，`vector`也会重新分配空间以容纳新增的元素。
+
+
+
+## 练习9.40
+
+> 如果上一题的程序读入了256个词，在`resize`之后容器的`capacity`可能是多少？如果读入了512个、1000个、或1048个呢？
+
+如果读入了256个词，`capacity` 仍然是 1024
+
+如果读入了512个词，`capacity` 仍然是 1024
+
+如果读入了1000个词，`capacity` 仍然是 1024
+
+如果读入了1048个词，`capacity` 取决于具体实现。
+
