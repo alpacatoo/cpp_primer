@@ -896,3 +896,508 @@ int main()
 
 如果读入了1048个词，`capacity` 取决于具体实现。
 
+
+
+## 练习9.41
+
+> 编写程序，从一个`vector<char>`初始化一个`string`。
+
+```C++
+vector<char> v{'h', 'e', 'l', 'l', '0'};
+string s(v.begin(), v.end());
+```
+
+
+
+## 练习9.42
+
+> 假定你希望每次读取一个字符存入一个`string`中，而且知道最少需要读取100个字符，应该如何提高程序的性能？
+
+使用 `reserve(100)` 函数预先分配100个元素的空间。
+
+
+
+## 练习9.43
+
+> 编写一个函数，接受三个`string`参数是`s`、`oldVal` 和`newVal`。使用迭代器及`insert`和`erase`函数将`s`中所有`oldVal`替换为`newVal`。测试你的程序，用它替换通用的简写形式，如，将"tho"替换为"though",将"thru"替换为"through"。
+
+```C++
+#include <iostream>
+#include <string>
+using std::string;
+
+void replace_with(string &s, string oldval, string newval)
+{
+    auto curr = s.begin();
+    while (curr != (s.end()-oldval.size()))
+    {
+        if (oldval == string(curr, curr+oldval.size()))
+        {
+            curr = s.erase(curr, curr + oldval.size());
+            curr = s.insert(curr, newval.begin(), newval.end());
+            curr += newval.size();
+        }
+        else
+            ++curr;
+    }
+}
+
+int main()
+{
+    string s{ "hello how thru world thu like love haha tho end." };
+    std::cout << s << std::endl;
+    replace_with(s, "tho", "though");
+    replace_with(s, "thru", "through");
+    std::cout << s << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> hello how thru world thu like love haha tho end.
+> hello how through world thu like love haha though end.
+> 请按任意键继续. . .
+
+
+
+## 练习9.44
+
+> 重写上一题的函数，这次使用一个下标和`replace`。
+
+```C++
+#include <iostream>
+#include <string>
+using std::string;
+
+void replace_with(string &s, string oldval, string newval)
+{
+    size_t curr = 0;
+    while (curr < (s.size()-oldval.size()))
+    {
+        if (oldval == s.substr(curr, oldval.size()))
+        {
+            s = s.replace(curr,oldval.size(),newval);
+            curr += newval.size();
+        }
+        else
+            ++curr;
+    }
+}
+
+int main()
+{
+    string s{ "hello how thru world thu like love haha tho end." };
+    std::cout << s << std::endl;
+    replace_with(s, "tho", "though");
+    replace_with(s, "thru", "through");
+    replace_with(s, "love", "le");
+    std::cout << s << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> hello how thru world thu like love haha tho end.
+> hello how through world thu like le haha though end.
+> 请按任意键继续. . .
+
+
+
+## 练习9.45
+
+> 编写一个函数，接受一个表示名字的`string`参数和两个分别表示前缀（如"Mr."或"Mrs."）和后缀（如"Jr."或"III"）的字符串。使用迭代器及`insert`和`append`函数将前缀和后缀添加到给定的名字中，将生成的新`string`返回。
+
+```C++
+#include <iostream>
+#include <string>
+using std::string;
+void add_pre_suffix(string &name, string pre, string suffix)
+{
+    name.insert(name.begin(), pre.begin(), pre.end());
+    name.append(suffix);
+}
+int main()
+{
+    string name("alpacatoo");
+    add_pre_suffix(name, "Mr.", " Jr.");
+    std::cout << name << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> Mr.alpacatoo Jr.
+> 请按任意键继续. . .
+
+
+
+## 练习9.46
+
+> 重写上一题的函数，这次使用位置和长度来管理`string`，并只使用`insert`。
+
+```C++
+#include <iostream>
+#include <string>
+using std::string;
+void add_pre_suffix(string &name, string pre, string suffix)
+{
+    name.insert(0, pre);
+    name.insert(name.size(), suffix);
+}
+int main()
+{
+    string name("alpacatoo");
+    add_pre_suffix(name, "Mr.", " Jr.");
+    std::cout << name << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> Mr.alpacatoo Jr.
+> 请按任意键继续. . .
+
+
+
+## 练习9.47
+
+> 编写程序，首先查找`string`"ab2c3d7R4E6"中每个数字字符，然后查找其中每个字母字符。编写两个版本的程序，第一个要使用`find_first_of`，第二个要使用`find_first_not_of`。
+
+```C++
+#include <iostream>
+#include <string>
+using std::string;
+int main()
+{
+    string numbers("0123456789");
+    string s("ab2c3d7R4E6");
+    std::cout << "find_first_of:" << std::endl;
+    for (int pos = 0; (pos = s.find_first_of(numbers, pos)) != string::npos; ++pos)
+        std::cout << s[pos] << ", ";
+    std::cout << std::endl;
+    std::cout << "find_first_not_of:" << std::endl;
+    for (int pos = 0; (pos = s.find_first_not_of(numbers, pos)) != string::npos; ++pos)
+        std::cout << s[pos] << ", ";
+    std::cout << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> find_first_of:
+> 2, 3, 7, 4, 6,
+> find_first_not_of:
+> a, b, c, d, R, E,
+> 请按任意键继续. . .
+
+
+
+## 练习9.48
+
+> 假定`name`和`numbers`的定义如325页所示，`numbers.find(name)`返回什么？
+
+返回 `string::npos`
+
+
+
+## 练习9.49
+
+> 如果一个字母延伸到中线之上，如d或f，则称其有上出头部分（`ascender`）。如果一个字母延伸到中线之下，如p或g，则称其有下出头部分（`descender`）。编写程序，读入一个单词文件，输出最长的既不包含上出头部分，也不包含下出头部分的单词。
+
+```C++
+#include <string>
+#include <iostream>
+#include <fstream>
+using std::string;
+int main()
+{
+    std::ifstream ifs("../ch09/find.txt");
+    if (!ifs)   return EXIT_FAILURE;
+    string s,longest;
+    while (ifs >> s)
+    {
+        if (string::npos == s.find_first_not_of("aceimnorsuvwxz"))
+        {
+            longest = longest.size() < s.size() ? s : longest;
+        }
+    }
+    std::cout << longest << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> PS C:\cpp_primer\Debug> .\cpp_primer.exe
+> aceimnorsuvwxz
+> PS C:\\cpp_primer\Debug>
+
+
+
+## 练习9.50
+
+> 编写程序处理一个`vector<string>`，其元素都表示整型值。计算`vector`中所有元素之和。修改程序，使之计算表示浮点值的`string`之和。
+
+```C++
+#include <string>
+#include <iostream>
+#include <vector>
+int sum_int(std::vector<std::string> & v)
+{
+    int sum = 0;
+    for (auto i : v)
+        sum += std::stoi(i);
+    return sum;
+}
+double sum_double(std::vector<std::string> &v)
+{
+    double sum = 0.0;
+    for (auto d : v)
+    {
+        sum += std::stod(d);
+    }
+    return sum;
+}
+int main()
+{
+    std::vector<std::string> v{"1", "2.5", "3.2"};
+    std::cout << sum_int(v) << std::endl;
+    std::cout << sum_double(v) << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 6
+> 6.7
+> 请按任意键继续. . .
+
+
+
+## 练习9.51
+
+> 设计一个类，它有三个`unsigned`成员，分别表示年、月和日。为其编写构造函数，接受一个表示日期的`string`参数。你的构造函数应该能处理不同的数据格式，如January 1,1900、1/1/1990、Jan 1 1900 等。
+
+```C++
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+class myData
+{
+private:
+    unsigned day = 1, month = 1, year = 1970;
+public:
+    myData(const string &s)
+    {
+        if (s.find("/") != string::npos)
+        {
+            // 1/1/1900
+            auto first = s.find_first_of("/");
+            auto second = s.find_last_of("/");
+            month = stoi(s.substr(0, first));
+            day = stoi(s.substr(first + 1, second - first - 1));
+            year = stoi(s.substr(second + 1));
+        }
+        else
+        {
+            // January 1, 1900 or Jan 1, 1900 or Jan 1 1900
+            vector<string> months{"Jan","Feb", "Mar", "Apr", "May","June", 
+                "July","Aug", "Sep", "Oct", "Nov", "Dec"};
+            auto curr = months.begin();
+            while (curr != months.end())
+            {
+                if (string::npos != s.find(*curr))    
+                    break;  
+                ++curr;
+            }
+            if (curr != months.end())
+            {
+                month = curr - months.begin() + 1;
+                auto first = s.find_first_of(" ,");
+                auto second = s.find_last_of(" ,");
+                day = stoi(s.substr(first + 1, second - first - 1));
+                year = stoi(s.substr(second + 1));
+            }
+        }
+    }
+    void print_data(const char * s)
+    {
+        cout << s
+            << "Year: " << year << ", "
+            << "Month: " << month << ", "
+            << "Day: " << day << endl;
+    }
+};
+
+int main()
+{
+    myData format1("4/30/1982: ");
+    format1.print_data("4/12/1982 : ");
+    myData format2("February 27,2001");
+    format2.print_data("February 27,2001: ");
+    myData format3("Sep 22 2010");
+    format3.print_data("Sep 22 2010: ");
+    myData format4("July 7, 2014");
+    format4.print_data("July 15, 2014 : ");
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 4/12/1982 : Year: 1982, Month: 4, Day: 30
+> February 27,2001: Year: 2001, Month: 2, Day: 27
+> Sep 22 2010: Year: 2010, Month: 9, Day: 22
+> July 15, 2014 : Year: 2014, Month: 7, Day: 7
+> 请按任意键继续. . .
+
+
+
+## 练习9.52
+
+> 使用`stack`处理括号化的表达式。当你看到一个左括号，将其记录下来。当你在一个左括号之后看到一个右括号，从`stack`中`pop`对象，直至遇到左括号，将左括号也一起弹出栈。然后将一个值（括号内的运算结果）`push`到栈中，表示一个括号化的（子）表达式已经处理完毕，被其运算结果所替代。
+
+```C++
+#include <stack>
+#include <vector>
+#include <string>
+#include <iostream>
+using namespace std;
+int main()
+{
+    string expr{"11+2*5+(14*2+3)*6"};
+    vector<string> v;
+    //split
+    string::size_type front_pos = 0;
+    string::size_type back_pos = expr.find_first_of("-+*/()");
+    while (string::npos != back_pos)
+    {
+        if (front_pos != back_pos)  // number
+            v.push_back(expr.substr(front_pos, back_pos - front_pos));
+        v.push_back(expr.substr(back_pos, 1));  // operator
+        front_pos = back_pos + 1;
+        back_pos = expr.find_first_of("-+*/()", front_pos);
+    }
+    v.push_back(expr.substr(front_pos));
+    //打印分段
+    std::cout << "split v: " << endl;
+    for (auto s : v)
+        std::cout << s << endl;
+
+    // back format
+    stack<string> stk;
+    vector<string> v_back;
+    for (auto s : v)
+    {
+        if (s.size() > 1 || string::npos == s.find_first_of("-+*/()"))
+        {   //操作数
+            v_back.push_back(s);
+        }
+        else if (s == ")")
+        {
+            while (stk.top() != "(")
+            {
+                
+                v_back.push_back(stk.top());
+                stk.pop();
+            }
+            stk.pop();
+        }
+        else
+        {   // "-+*/("
+            while (!stk.empty())
+            {
+                if ((s == "-" || s == "+") &&
+                    (stk.top() == "*" || stk.top() == "/"))
+                {   //当前字符优先级低于栈顶元素，出栈
+                    v_back.push_back(stk.top());
+                    stk.pop();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            //出栈后，将字符压入
+            stk.push(s);
+        }
+    }
+    while (!stk.empty())
+    {
+        v_back.push_back(stk.top());
+        stk.pop();
+    }
+    //打印后缀
+    std::cout << "back v: " << endl;
+    for (auto s : v_back)
+        std::cout << s << endl;
+    // calculate
+    stack<double> stk_sum;
+    for (auto s : v_back)
+    {
+        if (s.size() > 1 || string::npos == s.find_first_of("-+*/()"))
+        {   //操作数
+            stk_sum.push(stod(s));
+        }
+        else
+        {
+            auto op1 = stk_sum.top();
+            stk_sum.pop();
+            auto op2 = stk_sum.top();
+            stk_sum.pop();
+            switch (s[0])
+            {
+            case '-': stk_sum.push(op2 - op1); break;
+            case '+': stk_sum.push(op2 + op1); break;
+            case '*': stk_sum.push(op2 * op1); break;
+            case '/': stk_sum.push(op2 / op1); break;
+            default: break;
+            }
+        }
+    }
+    std::cout << "Result: " << stk_sum.top() << endl;
+ 
+}
+```
+
+运行结果：
+
+> split v:
+> 11
+> +
+> 2
+> *
+> 5
+> +
+> (
+> 14
+> *
+> 2
+> +
+> 3
+> )
+> *
+> 6
+> back v:
+> 11
+> 2
+> 5
+> *
+> 14
+> 2
+> *
+> 3
+> +
+> 6
+> *
+> +
+> +
+> Result: 207
+> 请按任意键继续. . .
