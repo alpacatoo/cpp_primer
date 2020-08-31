@@ -628,3 +628,58 @@ int main()
 
 
 
+## 练习10.20
+
+> 标准库定义了一个名为 `count_if` 的算法。类似 `find_if`，此函数接受一对迭代器，表示一个输入范围，还接受一个谓词，会对输入范围中每个元素执行。`count_if`返回一个计数值，表示谓词有多少次为真。使用`count_if`重写我们程序中统计有多少单词长度超过6的部分。
+
+```C++
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <iostream>
+using namespace std;
+int bigerthan6(const vector<string> &words)
+{
+    return count_if(words.begin(), words.end(), [](const string &s)
+                                                    {return s.size() > 6; });
+}
+int main()
+{
+    vector<string> vs{"dfdf", "kubernetes", "world", "docker", "goodbye"};
+    cout << bigerthan6(vs) << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 2
+> 请按任意键继续. . .
+
+
+
+## 练习10.21
+
+> 编写一个 `lambda`，捕获一个局部 `int` 变量，并递减变量值，直至它变为0。一旦变量变为0，再调用`lambda`应该不再递减变量。`lambda`应该返回一个`bool`值，指出捕获的变量是否为0。
+
+```C++
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <iostream>
+using namespace std;
+int main()
+{
+    int i = 6;
+    auto f = [&i]() -> bool{return i > 0 ? --i : i; };
+    while (f())
+        cout << i << " ";
+    cout << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 5 4 3 2 1
+> 请按任意键继续. . .
