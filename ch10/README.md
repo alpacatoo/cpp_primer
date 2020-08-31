@@ -198,3 +198,163 @@ int main()
 > 你认为算法不改变容器大小的原因是什么？
 
 算法的参数是迭代器，不是容器本身。
+
+
+
+## 练习10.11
+
+> 编写程序，使用 `stable_sort` 和 `isShorter` 将传递给你的 `elimDups` 版本的 `vector` 排序。打印 `vector`的内容，验证你的程序的正确性。
+
+```C++
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+bool isShorter(const string &s1, const string &s2)
+{
+    return s1.size() < s2.size();
+}
+void elimDups(vector<string> &words)
+{
+    sort(words.begin(), words.end());
+    auto end_unique = unique(words.begin(), words.end());
+    words.erase(end_unique, words.end());
+}
+int main()
+{
+    vector<string> v{ "1234", "272", "1111", "1234", "783", "222" };
+    elimDups(v);
+    stable_sort(v.begin(), v.end(), isShorter);
+    for (auto s: v)
+        cout << s << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+>222
+>272
+>783
+>1111
+>1234
+>请按任意键继续. . .
+
+
+
+## 练习10.12
+
+> 编写名为 `compareIsbn` 的函数，比较两个 `Sales_data` 对象的`isbn()` 成员。使用这个函数排序一个保存 `Sales_data` 对象的 `vector`。
+
+```C++
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using std::vector;
+using std::string;
+class Sales_data;
+std::istream& read(std::istream &in, Sales_data &item);
+class Sales_data{
+    friend Sales_data& Sales_data::combine(const Sales_data &input);
+    friend std::istream& read(std::istream &in, Sales_data &item);
+    friend std::ostream& print(std::ostream &out, const Sales_data &item);
+public:
+    Sales_data() = default;
+    Sales_data(const std::string&s) :bookNo(s) {}
+    Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(n*p){ }
+    Sales_data(std::istream &is) { read(is, *this); }
+
+    std::string isbn() const { return bookNo; }
+    Sales_data& combine(const Sales_data &input);
+    double avg_price(){ return units_sold ? (revenue / units_sold) : 0; }
+
+private:
+    std::string bookNo;
+    unsigned units_sold = 0;
+    double revenue = 0.0;
+};
+Sales_data& Sales_data::combine(const Sales_data &input)
+{
+    units_sold += input.units_sold;
+    revenue += input.revenue;
+    return *this;
+}
+std::istream& read(std::istream &in, Sales_data &item)
+{
+    double price = 0.0;
+    in >> item.bookNo >> item.units_sold >> price;
+    item.revenue = price * item.units_sold;
+    return in;
+}
+std::ostream& print(std::ostream &out, const Sales_data &item)
+{
+    double price = 0.0;
+    out << item.bookNo << " " << item.units_sold << " "
+        << item.revenue << " " << item.revenue / item.units_sold;
+    return out;
+}
+Sales_data add(const Sales_data &lhs, const Sales_data &rhs)
+{
+    Sales_data sum = lhs;
+    sum.combine(rhs);
+    return sum;
+}
+bool compareIsbn(const Sales_data &s1, const Sales_data &s2)
+{
+    return s1.isbn().size() < s2.isbn().size();
+}
+int main()
+{
+    vector<Sales_data> v{ Sales_data("aa"), Sales_data("aaaa"), Sales_data("as"), Sales_data("1111"), Sales_data("ks") };
+    std::sort(v.begin(), v.end(), compareIsbn);
+    for (auto &s : v)
+        std::cout << s.isbn() << std::endl;
+}
+```
+
+运行结果：
+
+> aa
+> as
+> ks
+> aaaa
+> 1111
+> 请按任意键继续. . .
+
+
+
+## 练习10.13
+
+> 标准库定义了名为 `partition` 的算法，它接受一个谓词，对容器内容进行划分，使得谓词为`true` 的值会排在容器的前半部分，而使得谓词为 `false` 的值会排在后半部分。算法返回一个迭代器，指向最后一个使谓词为 `true` 的元素之后的位置。编写函数，接受一个 `string`，返回一个 `bool` 值，指出 `string` 是否有5个或更多字符。使用此函数划分 `words`。打印出长度大于等于5的元素。
+
+```C++
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+using namespace std;
+bool chNum(const string &s)
+{
+    return s.size() >= 5 ? true : false;
+}
+int main()
+{
+    vector<string> v{ "a", "as", "aasss", "aaaaassaa", "aaaaaabba", "aaa" };
+    auto par_end = partition(v.begin(), v.end(), chNum);
+    for (auto curr = v.begin(); curr != par_end; ++curr)
+        cout << *curr << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果；
+
+> aaaaaabba
+> aaaaassaa
+> aasss
+> 请按任意键继续. . .
+
+
+
