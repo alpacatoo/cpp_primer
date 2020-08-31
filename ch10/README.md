@@ -358,3 +358,273 @@ int main()
 
 
 
+## 练习10.14
+
+> 编写一个`lambda`，接受两个`int`，返回它们的和。
+
+```C++
+auto a = [] (const int a, const int b) {return a+b;};
+```
+
+
+
+## 练习10.15
+
+> 编写一个 `lambda` ，捕获它所在函数的 `int`，并接受一个 `int`参数。`lambda` 应该返回捕获的 `int` 和 `int` 参数的和。
+
+```C++
+int a = 19;
+auto f = [a](int b) { return a+b; };
+```
+
+
+
+## 练习10.16
+
+> 使用 `lambda` 编写你自己版本的 `biggies`。
+
+```C++
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+void elimDups(vector<string> &vs)
+{
+    sort(vs.begin(), vs.end());
+    auto v_uniq = unique(vs.begin(), vs.end());
+    vs.erase(v_uniq, vs.end());
+}
+string make_plural(const int size, const string &s, const string &ending)
+{
+    return size > 1 ? s + ending : s;
+}
+void biggies(vector<string> &words, vector<string>::size_type sz)
+{
+    elimDups(words);
+    cout << "elimDups result: ";
+    for (auto s : words)
+        cout << s << " ";
+    cout << endl;
+    stable_sort(words.begin(), words.end(),
+        [](const string &a, const string &b)
+            { return a.size() < b.size(); });
+    cout << "stable_sort result: ";
+    for (auto s : words)
+        cout << s << " ";
+    cout << endl;
+    auto wc = find_if(words.begin(), words.end(),
+                [sz](const string &a)
+                    { return a.size() >= sz; });
+    auto count = words.end() - wc;
+    cout << count << " " << make_plural(count, "words", "s")
+        << " of length " << sz << " or longer" << endl;
+    for_each(wc, words.end(),
+        [](const string &s){cout << s << " "; });
+    cout << endl;
+}
+int main()
+{
+    vector<string> v{ "a", "aaaaaabba", "bbb", "aa", "bba", "aa", "a", "aaaaaabba", "aaa", "bbb" };
+    biggies(v, 2);
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> elimDups result: a aa aaa aaaaaabba bba bbb
+> stable_sort result: a aa aaa bba bbb aaaaaabba
+> 5 wordss of length 2 or longer
+> aa aaa bba bbb aaaaaabba
+> 请按任意键继续. . .
+
+
+
+## 练习10.17
+
+> 重写10.3.1节练习10.12的程序，在对`sort`的调用中使用 `lambda` 来代替函数 `compareIsbn`。
+
+```C++
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using std::vector;
+using std::string;
+class Sales_data;
+std::istream& read(std::istream &in, Sales_data &item);
+class Sales_data{
+    friend Sales_data& Sales_data::combine(const Sales_data &input);
+    friend std::istream& read(std::istream &in, Sales_data &item);
+    friend std::ostream& print(std::ostream &out, const Sales_data &item);
+public:
+    Sales_data() = default;
+    Sales_data(const std::string&s) :bookNo(s) {}
+    Sales_data(const std::string &s, unsigned n, double p) :bookNo(s), units_sold(n), revenue(n*p){ }
+    Sales_data(std::istream &is) { read(is, *this); }
+
+    std::string isbn() const { return bookNo; }
+    Sales_data& combine(const Sales_data &input);
+    double avg_price(){ return units_sold ? (revenue / units_sold) : 0; }
+
+private:
+    std::string bookNo;
+    unsigned units_sold = 0;
+    double revenue = 0.0;
+};
+Sales_data& Sales_data::combine(const Sales_data &input)
+{
+    units_sold += input.units_sold;
+    revenue += input.revenue;
+    return *this;
+}
+std::istream& read(std::istream &in, Sales_data &item)
+{
+    double price = 0.0;
+    in >> item.bookNo >> item.units_sold >> price;
+    item.revenue = price * item.units_sold;
+    return in;
+}
+std::ostream& print(std::ostream &out, const Sales_data &item)
+{
+    double price = 0.0;
+    out << item.bookNo << " " << item.units_sold << " "
+        << item.revenue << " " << item.revenue / item.units_sold;
+    return out;
+}
+Sales_data add(const Sales_data &lhs, const Sales_data &rhs)
+{
+    Sales_data sum = lhs;
+    sum.combine(rhs);
+    return sum;
+}
+int main()
+{
+    vector<Sales_data> v{ Sales_data("aa"), Sales_data("aaaa"), Sales_data("as"), Sales_data("1111"), Sales_data("ks") };
+    std::sort(v.begin(), v.end(), [](const Sales_data &s1, const Sales_data &s2)
+                                        {return s1.isbn().size() < s2.isbn().size(); });
+    for (auto &s : v)
+        std::cout << s.isbn() << std::endl;
+}
+```
+
+运行结果：
+
+> aa
+> as
+> ks
+> aaaa
+> 1111
+> 请按任意键继续. . .
+
+
+
+## 练习10.18
+
+> 重写 `biggies`，用 `partition` 代替 `find_if`。我们在10.3.1节练习10.13中介绍了 `partition` 算法。
+
+```C++
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iostream>
+using namespace std;
+void elimDups(vector<string> &vs)
+{
+    sort(vs.begin(), vs.end());
+    auto v_uniq = unique(vs.begin(), vs.end());
+    vs.erase(v_uniq, vs.end());
+}
+string make_plural(const int size, const string &s, const string &ending)
+{
+    return size > 1 ? s + ending : s;
+}
+void biggies_partition(vector<string> &words, vector<string>::size_type sz)
+{
+    elimDups(words);
+    cout << "elimDups result: ";
+    for (auto s : words)
+        cout << s << " ";
+    cout << endl;
+    auto wc = partition(words.begin(), words.end(),
+                            [sz](const std::string &s)
+                                {return s.size() < sz; });
+    auto count = words.end() - wc;
+    cout << count << " " << make_plural(count, "words", "s")
+        << " of length " << sz << " or longer" << endl;
+    for_each(wc, words.end(),
+        [](const string &s){cout << s << " "; });
+    cout << endl;
+}
+int main()
+{
+    vector<string> v{ "a", "aaaaaabba", "bbb", "aa", "bba", "aa", "a", "aaaaaabba", "aaa", "bbb" };
+    biggies_partition(v, 2);
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> elimDups result: a aa aaa aaaaaabba bba bbb
+> 5 wordss of length 2 or longer
+> aa aaa aaaaaabba bba bbb
+> 请按任意键继续. . .
+
+
+
+## 练习10.19
+
+> 用 `stable_partition` 重写前一题的程序，与 `stable_sort` 类似，在划分后的序列中维持原有元素的顺序。
+
+```C++
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iostream>
+using namespace std;
+void elimDups(vector<string> &vs)
+{
+    sort(vs.begin(), vs.end());
+    auto v_uniq = unique(vs.begin(), vs.end());
+    vs.erase(v_uniq, vs.end());
+}
+string make_plural(const int size, const string &s, const string &ending)
+{
+    return size > 1 ? s + ending : s;
+}
+void biggies_partition(vector<string> &words, vector<string>::size_type sz)
+{
+    elimDups(words);
+    cout << "elimDups result: ";
+    for (auto s : words)
+        cout << s << " ";
+    cout << endl;
+    auto wc = stable_partition(words.begin(), words.end(),
+        [sz](const std::string &s)
+    {return s.size() < sz; });
+    auto count = words.end() - wc;
+    cout << count << " " << make_plural(count, "words", "s")
+        << " of length " << sz << " or longer" << endl;
+    for_each(wc, words.end(),
+        [](const string &s){cout << s << " "; });
+    cout << endl;
+}
+int main()
+{
+    vector<string> v{ "a", "aaaaaabba", "bbb", "aa", "bba", "aa", "a", "aaaaaabba", "aaa", "bbb" };
+    biggies_partition(v, 2);
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> elimDups result: a aa aaa aaaaaabba bba bbb
+> 5 wordss of length 2 or longer
+> aa aaa aaaaaabba bba bbb
+> 请按任意键继续. . .
+
+
+
