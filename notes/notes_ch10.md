@@ -102,5 +102,42 @@
 - lambda体包含`return`语句之外的语句，编译器**推断返回类型是void**
 - lambda返回类型通过尾置返回类型
 
+### 参数绑定
 
+- 一个操作需要很多语句才能完成时，通常使用函数更好
+
+- lambda表达式的捕获列表为空，则可以用函数来替代它
+
+- 当lambda表达公式的捕获列表不为空，则使用`bind`函数绑定参数
+
+  - 一般形式：`auto newCallable = bind(callable, arg_list)`
+  - `arg_list`中可能包含形如`_n`的名字，其中`n`是一个整数，是占位符
+  - 例子，捕获列表被绑定，参数通过占位符绑定
+
+  ```C++
+  //lambda
+  auto wc = find_if(words.begin(), words.end(),
+                   [sz](const string &a));
+  //替换为
+  auto wc = find_if(words.begin(),words.end(),
+                   bind(check_size, _1, sz))
+  ```
+
+- 占位符的声明空间：`using std::placeholders`
+
+- 重排调用给你参数顺序
+
+```C++
+// f的第1，2，4参数分别被绑定到a, b, c的数值
+auto g = bind(f, a, b, _2, c, _1);
+// 调用绑定后的函数g
+g(X, Y);
+// 等价的调用f参数
+f(a, b, Y, c, X);
+```
+
+- 绑定引用参数
+  - 默认情况，`bind`的占位符的参数**被拷贝**到`bind`返回的可调对象中；
+  - **ref()**函数，返回对象的引用；**cref()**函数，返回`const`引用的对象；
+  - 上述函数定义在**functional**头文件中
 

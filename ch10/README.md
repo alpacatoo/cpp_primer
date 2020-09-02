@@ -683,3 +683,134 @@ int main()
 
 > 5 4 3 2 1
 > 请按任意键继续. . .
+
+
+
+## 练习10.22
+
+> 重写统计长度小于等于6的单词数量的程序，使用函数代替`lambda`。
+
+```C++
+#include <algorithm>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <functional>
+using namespace std;
+using namespace std::placeholders;
+bool isLessEqthan6(const string &words, string::size_type sz)
+{
+    return words.size() <= sz;
+}
+int main()
+{
+    vector<string> vs{ "dfdf", "kubernetes", "world", "docker", "goodbye" };
+    cout << count_if(vs.cbegin(), vs.cend(), bind(isLessEqthan6, _1, 6)) << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 3
+> 请按任意键继续. . .
+
+
+
+## 练习10.23
+
+> `bind` 接受几个参数？
+
+假设被绑定的函数接受 `n` 个参数，那么`bind` 接受`n + 1`个参数。
+
+
+
+## 练习10.24
+
+> 给定一个`string`，使用 `bind` 和 `check_size` 在一个 `int` 的`vector` 中查找第一个大于`string`长度的值。
+
+```C++
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <functional>
+using namespace std;
+using namespace std::placeholders;
+int check_size(const string &s, const int i)
+{
+    return i > static_cast<int>(s.size());
+}
+int main()
+{
+    vector<int> vi{ 1, 2, 3, 4, 5, 6, 7 };
+    string s = "like";
+    auto wc = find_if(vi.cbegin(), vi.cend(), bind(check_size, s, _1));
+    cout << *wc << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 5
+> 请按任意键继续. . .
+
+
+
+## 练习10.25
+
+> 在10.3.2节的练习10.18中，编写了一个使用`partition` 的`biggies`版本。使用 `check_size` 和 `bind` 重写此函数。
+
+```C++
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iostream>
+#include <functional>
+using namespace std;
+using namespace std::placeholders;
+void elimDups(vector<string> &vs)
+{
+    sort(vs.begin(), vs.end());
+    auto v_uniq = unique(vs.begin(), vs.end());
+    vs.erase(v_uniq, vs.end());
+}
+string make_plural(const int size, const string &s, const string &ending)
+{
+    return size > 1 ? s + ending : s;
+}
+bool check_size(const string &s, string::size_type sz)
+{
+    return s.size() < sz;
+}
+void biggies_partition(vector<string> &words, vector<string>::size_type sz)
+{
+    elimDups(words);
+    cout << "elimDups result: ";
+    for (auto s : words)
+        cout << s << " ";
+    cout << endl;
+    auto wc = partition(words.begin(), words.end(), bind(check_size, _1, sz));
+    auto count = words.end() - wc;
+    cout << count << " " << make_plural(count, "words", "s")
+        << " of length " << sz << " or longer" << endl;
+    for_each(wc, words.end(),
+        [](const string &s){cout << s << " "; });
+    cout << endl;
+}
+int main()
+{
+    vector<string> v{ "a", "aaaaaabba", "bbb", "aa", "bba", "aa", "a", "aaaaaabba", "aaa", "bbb" };
+    biggies_partition(v, 2);
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> elimDups result: a aa aaa aaaaaabba bba bbb
+> 5 wordss of length 2 or longer
+> aa aaa aaaaaabba bba bbb
+> 请按任意键继续. . .
+
