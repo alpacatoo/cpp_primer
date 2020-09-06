@@ -814,3 +814,400 @@ int main()
 > aa aaa aaaaaabba bba bbb
 > 请按任意键继续. . .
 
+
+
+## 练习10.26
+
+> 解释三种插入迭代器的不同之处。
+
+* `back_inserter` 使用 `push_back` 。
+* `front_inserter` 使用 `push_front` 。
+* `inserter` 使用 `insert`，此函数接受第二个参数，这个参数必须是一个指向给定容器的迭代器。元素将被插入到给定迭代器所表示的元素之前。
+
+
+
+## 练习10.27
+
+> 除了 `unique` 之外，标准库还定义了名为 `unique_copy` 的函数，它接受第三个迭代器，表示拷贝不重复元素的目的位置。编写一个程序，使用 `unique_copy`将一个`vector`中不重复的元素拷贝到一个初始化为空的`list`中。
+
+```C++
+#include <vector>
+#include <list>
+#include <algorithm>
+#include <iterator>
+#include <iostream>
+using namespace std;
+int main()
+{
+    //vector<int> vi{ 1, 1, 2, 3, 4, 3, 2, 4, 6, 5, 6, 7, 5 };
+    vector<int> vi{ 1, 1, 2, 2, 2, 4, 4, 4, 3, 3, 3 };
+    list<int> li;
+    //unique只能去除相临重复元素
+    unique_copy(vi.cbegin(), vi.cend(), back_inserter(li));
+    for (auto i : li)
+        cout << i << " ";
+    cout << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 1 2 4 3
+> 请按任意键继续. . .
+
+
+
+## 练习10.28
+
+> 一个`vector` 中保存 1 到 9，将其拷贝到三个其他容器中。分别使用`inserter`、`back_inserter` 和 `front_inserter` 将元素添加到三个容器中。对每种 `inserter`，估计输出序列是怎样的，运行程序验证你的估计是否正确。
+
+```C++
+#include <vector>
+#include <iostream>
+#include <iterator>
+#include <list>
+using namespace std;
+int main()
+{
+    vector<int> vi{ 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    list<int> l_back, l_front, l_insert;
+    copy(vi.cbegin(), vi.cend(), back_inserter(l_back));
+    copy(vi.cbegin(), vi.cend(), front_inserter(l_front));
+    copy(vi.cbegin(), vi.cend(), inserter(l_insert,l_insert.begin()));
+    for (auto i : l_back)
+        cout << i << " ";
+    cout << endl;
+    for (auto i : l_front)
+        cout << i << " ";
+    cout << endl;
+    for (auto i : l_insert)
+        cout << i << " ";
+    cout << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 1 2 3 4 5 6 7 8 9
+> 9 8 7 6 5 4 3 2 1
+> 1 2 3 4 5 6 7 8 9
+> 请按任意键继续. . .
+
+
+
+## 练习10.29
+
+> 编写程序，使用流迭代器读取一个文本文件，存入一个`vector`中的`string`里。
+
+```C++
+#include <string>
+#include <iterator>
+#include <iostream>
+#include <vector>
+#include <fstream>
+using namespace std;
+int main()
+{
+    ifstream infile("../ch10/book.txt");
+    istream_iterator<string> in_iter(infile), eof;
+    vector<string> vs(in_iter, eof);
+    for (auto s : vs)
+        cout << s << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> PS C:\cpp_primer\Debug> .\cpp_primer.exe
+> do
+> it
+> best
+> like
+> it
+> bye
+> bye
+> PS C:\cpp_primer\Debug>
+
+
+
+## 练习10.30
+
+> 使用流迭代器、`sort` 和 `copy` 从标准输入读取一个整数序列，将其排序，并将结果写到标准输出。
+
+```C++
+#include <iostream>
+#include <iterator>
+#include <algorithm>
+#include <vector>
+using namespace std;
+int main()
+{
+    vector<int> vi;
+    cout << "input: " << endl;
+    istream_iterator<int> in_iter(cin), eof;
+    copy(in_iter, eof, back_inserter(vi));
+    sort(vi.begin(), vi.end());
+    cout << "output:" << endl;
+    copy(vi.cbegin(), vi.cend(), ostream_iterator<int>(cout, " "));
+    cout << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> input:
+> 5 4 2 1 6 8
+> 9 5 1 2 6 4
+> ^Z
+> output:
+> 1 1 2 2 4 4 5 5 6 6 8 9
+> 请按任意键继续. . .
+
+
+
+## 练习10.31
+
+> 修改前一题的程序，使其只打印不重复的元素。你的程序应该使用 `unique_copy`。
+
+```C++
+#include <iostream>
+#include <iterator>
+#include <algorithm>
+#include <vector>
+using namespace std;
+int main()
+{
+    vector<int> vi;
+    cout << "input: " << endl;
+    istream_iterator<int> in_iter(cin), eof;
+    copy(in_iter, eof, back_inserter(vi));
+    sort(vi.begin(), vi.end());
+    cout << "output:" << endl;
+    unique_copy(vi.cbegin(), vi.cend(), ostream_iterator<int>(cout, " "));
+    cout << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> input:
+> 5 4 2 1 6 8
+> 9 5 1 2 6 4
+> ^Z
+> output:
+> 1 2 4 5 6 8 9
+> 请按任意键继续. . .
+
+
+
+## 练习10.32
+
+> 重写1.6节中的书店程序，使用一个`vector`保存交易记录，使用不同算法完成处理。使用 `sort` 和10.3.1节中的 `compareIsbn` 函数来排序交易记录，然后使用 `find` 和 `accumulate` 求和。
+
+```C++
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <numeric>
+#include "Sales_item.h"
+
+int main()
+{
+    std::istream_iterator<Sales_item> in_iter(std::cin), in_eof;
+    std::vector<Sales_item> vec;
+
+    while (in_iter != in_eof)
+        vec.push_back(*in_iter++);
+    std::cout << "origin: " << vec.size() << std::endl;
+    for (auto v : vec)
+        std::cout << v << std::endl;
+    std::sort(vec.begin(), vec.end(), compareIsbn);
+    std::cout << "sorted:" << std::endl;
+    for (auto v : vec)
+        std::cout << v << std::endl;
+    std::cout << "accumulated:" << std::endl;
+    for (auto beg = vec.cbegin(), end = beg; beg != vec.cend(); beg = end) {
+        end = find_if(beg, vec.cend(), [beg](const Sales_item &item){ return item.isbn() != beg->isbn(); });
+        std::cout << std::accumulate(beg, end, Sales_item(beg->isbn())) << std::endl;
+    }
+}
+```
+
+运行结果：
+
+> 0-201-78345-x 3 20.00
+> 0-201-70353-x 4 24.99
+> 0-201-78345-x 2 25.00
+> ^Z
+> origin: 3
+> 0-201-78345-x 3 60 20
+> 0-201-70353-x 4 99.96 24.99
+> 0-201-78345-x 2 50 25
+> sorted:
+> 0-201-78345-x 2 50 25
+> 0-201-78345-x 3 60 20
+> 0-201-70353-x 4 99.96 24.99
+> accumulated:
+> 0-201-78345-x 5 110 22
+> 0-201-70353-x 4 99.96 24.99
+> 请按任意键继续. . .
+
+**Note**：VS编程环境，必须使用Realse编译酝酿下才能有结果。或者设置Debug的选项："Project"->"setting"->"点击c/c++"->"Category选项中选择Preprocessor"
+->"，在Undefined symbols:填写_DEBUG" 
+
+
+
+## 练习10.33
+
+> 编写程序，接受三个参数：一个输入文件和两个输出文件的文件名。输入文件保存的应该是整数。使用 `istream_iterator` 读取输入文件。使用 `ostream_iterator` 将奇数写入第一个输入文件，每个值后面都跟一个空格。将偶数写入第二个输出文件，每个值都独占一行。
+
+```C++
+#include <fstream>
+#include <iterator>
+#include <algorithm>
+
+int main(int argc, char **argv)
+{
+    if (argc != 4) return -1;
+
+    std::ifstream ifs(argv[1]);
+    std::ofstream ofs_odd(argv[2]), ofs_even(argv[3]);
+
+    std::istream_iterator<int> in(ifs), in_eof;
+    std::ostream_iterator<int> out_odd(ofs_odd, " "), out_even(ofs_even, "\n");
+
+    std::for_each(in, in_eof, [&out_odd, &out_even](const int i)
+    {
+        *(i & 0x1 ? out_odd : out_even)++ = i;
+    });
+
+    return 0;
+}
+```
+
+运行程序：
+
+> PS C:\cpp_primer\Release> .\cpp_primer.exe ..\ch10\num.txt ..\ch10\odd.txt ..\ch10\even.txt
+> PS C:\cpp_primer\Release>
+
+
+
+## 练习10.34
+
+> 使用 `reverse_iterator` 逆序打印一个`vector`。
+
+```C++
+#include <iostream>
+#include <vector>
+using namespace std;
+int main()
+{
+    vector<int> v = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    for (auto it = v.crbegin(); it != v.crend(); ++it)
+    {
+        cout << *it << endl;
+    }
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 9
+> 8
+> 7
+> 6
+> 5
+> 4
+> 3
+> 2
+> 1
+> 请按任意键继续. . .
+
+
+
+## 练习10.35
+
+> 使用普通迭代器逆序打印一个`vector`。
+
+```C++
+#include <iostream>
+#include <vector>
+using namespace std;
+int main()
+{
+    vector<int> v = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    for (auto it = v.cend()-1; true; --it)
+    {
+        std::cout << *it << " ";
+        if (it == v.cbegin()) break;
+    }
+    std::cout << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 9 8 7 6 5 4 3 2 1
+> 请按任意键继续. . .
+
+
+
+## 练习10.36
+
+> 使用 `find` 在一个 `int` 的`list` 中查找最后一个值为0的元素。
+
+```C++
+#include <iostream>
+#include <list>
+#include <algorithm>
+using namespace std;
+int main()
+{
+    list<int> l = { 1, 2, 0, 4, 5, 6, 7, 0, 9 };
+    auto it = find(l.crbegin(), l.crend(), 0);
+    cout << distance(it, l.crend()) << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 8
+> 请按任意键继续. . .
+
+
+
+## 练习10.37
+
+> 给定一个包含10 个元素的`vector`，将位置3到7之间的元素按逆序拷贝到一个`list`中。
+
+```C++
+#include <iostream>
+#include <list>
+#include <algorithm>
+#include <vector>
+#include <iterator>
+using namespace std;
+int main()
+{
+    vector<int> v = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+    list<int> l;
+    copy(v.crbegin() + 3, v.crbegin() + 8, back_inserter(l));
+    for (auto i : l) std::cout << i << " ";
+    cout << endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> 6 5 4 3 2
+> 请按任意键继续. . .
