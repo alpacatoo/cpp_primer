@@ -1211,3 +1211,85 @@ int main()
 
 > 6 5 4 3 2
 > 请按任意键继续. . .
+
+
+
+## 练习10.38
+
+> 列出5个迭代器类别，以及每类迭代器所支持的操作。
+
+* 输入迭代器 : `==`,`!=`,`++`,`*`,`->`
+* 输出迭代器 : `++`,`*`
+* 前向迭代器 : `==`,`!=`,`++`,`*`,`->`
+* 双向迭代器 : `==`,`!=`,`++`,`--`,`*`,`->`
+* 随机访问迭代器 : `==`,`!=`,`<`,`<=`,`>`,`>=`,`++`,`--`,`+`,`+=`,`-`,`-=`,`*`,`->`,`iter[n]`==`*(iter[n])`
+
+
+
+## 练习10.39
+
+> `list` 上的迭代器属于哪类？`vector`呢？
+
+* `list` 上的迭代器是 **双向迭代器**
+* `vector` 上的迭代器是 **随机访问迭代器**
+
+
+
+## 练习10.40
+
+> 你认为 `copy` 要求哪类迭代器？`reverse` 和 `unique` 呢？
+
+* `copy` 需要两个**输入迭代器**，一个**输出迭代器**
+* `reverse` 需要**双向迭代器**
+* `unique`需要**随机访问迭代器
+
+
+
+## 练习10.41
+
+> 仅根据算法和参数的名字，描述下面每个标准库算法执行什么操作：
+>
+> ```C++
+> replace(beg, end, old_val, new_val);
+> replace_if(beg, end, pred, new_val);
+> replace_copy(beg, end, dest, old_val, new_val);
+> replace_copy_if(beg, end, dest, pred, new_val);
+> ```
+
+* `replace` 在迭代器范围内用新值替换所有原来的旧值。
+* `replace_if` 在迭代器范围内，满足谓词条件的元素用新值替换。
+* `replace_copy` 复制迭代器范围内的元素到目标迭代器位置，如果元素等于某个旧值，则用新值替换
+* `replace_copy_if` 复制迭代器范围内的元素到目标迭代器位置，满足谓词条件的元素用新值替换
+
+
+
+## 练习10.42
+
+> 使用 `list` 代替 `vector` 重新实现10.2.3节中的去除重复单词的程序。
+
+```c++
+#include <iostream>
+#include <string>
+#include <list>
+using namespace std;
+void elimDups(list<string> &words)
+{
+    words.sort();
+    words.unique();
+}
+int main()
+{
+    list<string> l = { "aa", "aad", "aa", "aa", "aasss", "aa" };
+    elimDups(l);
+    for (const auto& e : l)
+        std::cout << e << std::endl;
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> aa
+> aad
+> aasss
+> 请按任意键继续. . .
