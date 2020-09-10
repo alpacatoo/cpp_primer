@@ -352,3 +352,62 @@ int main()
 > aaa bbb 20200101
 > ccc ddd 20200501
 > 请按任意键继续. . .
+
+
+
+## 练习11.15
+
+> 对一个`int`到`vector<int>的map`，其`mapped_type`、`key_type`和 `value_type`分别是什么？
+
+* `mapped_type` : `vector<int>`
+* `key_type` : `int`
+* `value_type` : `std::pair<const int,vector >`
+
+
+
+## 练习11.16
+
+> 使用一个`map`迭代器编写一个表达式，将一个值赋予一个元素。
+
+```C++
+std::map<int, string>::iterator it = m.begin();
+it->second = "hello";
+```
+
+
+
+## 练习11.17
+
+> 假定`c`是一个`string`的`multiset`，`v` 是一个`string` 的`vector`，解释下面的调用。指出每个调用是否合法：
+>
+> ```C++
+> copy(v.begin(), v.end(), inserter(c, c.end()));
+> copy(v.begin(), v.end(), back_inserter(c));
+> copy(c.begin(), c.end(), inserter(v, v.end()));
+> copy(c.begin(), c.end(), back_inserter(v));
+> ```
+
+第二个调用不合法，因为 `multiset` 没有 `push_back` 方法。其他调用都合法。
+
+
+
+## 练习11.18
+
+> 写出第382页循环中`map_it` 的类型，不要使用`auto` 或 `decltype`。
+
+```C++
+map<string, size_t>::const_iterator map_it = word_count.cbegin();
+```
+
+
+
+## 练习11.19
+
+> 定义一个变量，通过对11.2.2节中的名为 `bookstore` 的`multiset` 调用`begin()`来初始化这个变量。写出变量的类型，不要使用`auto` 或 `decltype`。
+
+```C++
+using compareType = bool (*)(const Sales_data &lhs, const Sales_data &rhs);
+std::multiset<Sales_data, compareType> bookstore(compareIsbn);
+std::multiset<Sales_data, compareType>::iterator c_it = bookstore.begin();
+```
+
