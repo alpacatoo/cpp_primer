@@ -84,7 +84,41 @@
 - 关联容器只可用于只读取元素的算法；几乎不用泛型算法
 - 关联容器使用算法，将它当作一个源序列，要么当作一个目的位置
 
+### 11.3.2 添加元素
 
+- 关联容器的`insert`成员函数，插入`key`重复的数值对容器没有影响
 
+- `insert`有两个版本，分别接受一对迭代器，或是一个初始化器列表
 
+- `insert`操作
+
+  - `c.insert(v)`和`c.emplacee(args)`
+
+    - 入参：`v`是`value_type`类型的对象，`args`用来构造一个元素的
+
+    - 返回值：
+
+      - `map`和`set`返回一个`pair`对象，包含一个指向关键字元素的迭代器，以及指示是否成功的bool值
+      - `multimap`和`multiset`，总会插入给定元素，返回指元素的迭代器
+
+    - 例子
+
+      ```C++
+      //插入的4种方法
+      word_count.insert({word, 1});
+      word_count.insert(make_pair(word, 1));
+      word_count.insert(pair<string, size_t>(word, 1));
+      word_count.insert(map<string, size_t>::value_type(word, 1));
+      ```
+
+  - `c.insert(b, e)`和`c.insert(il)`
+
+    - 入参：
+      - `b`和`e`是迭代器，表示一个`c::value_type`类型值的范围
+      - `il`表示该类型值的花括号列表
+    - 返回值：`void`
+
+  - `c.insert(p, v)`和`c.emplace(p, v)`：再指定`p`位置开始搜索新元素存储的位置；
+
+- `insert`返回值总结：没有重复关键字的容器，返回pair，first表示迭代器，second表示是否成功插入，有重复，则返回false
 
