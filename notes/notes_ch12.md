@@ -92,5 +92,31 @@
     - 方法2：释放内存后，指针赋值为`nullptr`
 - 多个内置指针指向相同的动态内存对象，设置一个为`nullptr`后，其他内置指针数值仍然不会变
 
+### 12.1.3 shared_ptr和new结合使用
+
+- 可以用new返回的指针初始化智能指针
+- 接受指针参数的智能指针构造函数是**explicit**
+  - 不能将一个内置指针隐式转换为一个智能指针：`shared_ptr<int> p1 = new int(1024)`是错误的
+  - 必须使用直接初始化形式：`shared_ptr<int> p2(new int(1024))`
+- 不要混合使用普通指针和智能指针
+  - 推荐使用`make_shared`，不使用`new`
+  - 避免无意中将同一块内存绑定到多个独立创建的`shared_ptr`上
+  - 当将一个`shared_ptr`绑定到一个普通指针时，我们即将内存的管理责任交给了这个`shared_ptr`。一旦这样做了，我们就不应该再使用内置指针来访问`shared_ptr`所指向的内存了。
+- 不要使用`get`初始化另一个智能指针或为智能指针赋值
+  - `get`返回的指针的代码不能`delete`此指针
+- 其他`shared_ptr`操作
+  - 初始化`shared_ptr`对象
+    - `shared_ptr<T> p(q)`：`p`管理内置指针`q`所指向的对象；`q`必须指向new分配的内存且能够转换为`T*`类型
+    - `shared_ptr<T> p(u)`：`p`从`unique_ptr u`那里接管了对象的所有权；将`u`置位空
+    - `shared_ptr<T> p(q, d)`：`p`接管了内置指针`q`所指向的对象的所有权。`q`必须能转换为`T*`类型。`p`将使用可调对象`d`来代替delete
+    - `shared_ptr<T> p(p2, d)`：`p`是`shared_ptr p2`的拷贝，使用可调对像`d`代替delete
+  - `reset`函数将内置指针赋值给`shared_ptr`
+    - `p.reset()`
+    - `p.reset(q)`
+    - `p.reset (q, d)`
+    - 若`p`是唯一指向其对象的`shared_ptr`，则释放此对象
+    - 若传递了内置指针`q`，则令`p`指向`q`，否则会将`p`置为空
+    - 若还传递了参数`d`，则会调用`d`而不是`delete`来释放`q`
+
 
 
