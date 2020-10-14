@@ -393,3 +393,66 @@ std::shared_ptr<connection> p(&conn, [](connection* p){ disconnect(*p); });
 > connecting now(1)
 > connection close(192.168.3.3:8888)
 > 请按任意键继续. . .
+
+
+
+## 练习12.16
+
+> 如果你试图拷贝或赋值 unique_ptr，编译器并不总是能给出易于理解的错误信息。编写包含这种错误的程序，观察编译器如何诊断这种错误。
+
+```C++
+#include <iostream>
+#include <string>
+#include <memory>
+
+int main()
+{
+    std::unique_ptr<std::string> p1(new std::string("hello"));
+    std::unique_ptr<std::string> p2 = p1; //error statement
+
+    std::cout << *p1 << std::endl;
+    p1.reset(nullptr);
+    return 0;
+}
+```
+
+编译错误：
+
+错误	1	error C2280: “std::unique_ptr<std::string,std::default_delete<_Ty>>::unique_ptr(const std::unique_ptr<_Ty,std::default_delete<_Ty>> &)”: 尝试引用已删除的函数	C:\Users\Chris\Desktop\cpp\cpp_primer\ch12\ex12_16.cpp	8	1	cpp_primer
+
+
+
+## 练习12.17
+
+> 下面的 unique_ptr 声明中，哪些是合法的，哪些可能导致后续的程序错误？解释每个错误的问题在哪里。
+>
+> ```C++
+> int ix = 1024, *pi = &ix, *pi2 = new int(2048);
+> typedef unique_ptr<int> IntP;
+> (a) IntP p0(ix);
+> (b) IntP p1(pi);
+> (c) IntP p2(pi2);
+> (d) IntP p3(&ix);
+> (e) IntP p4(new int(2048));
+> (f) IntP p5(p2.get());
+> ```
+
+(a) 不合法。在定义一个 unique_ptr 时，需要将其绑定到一个new 返回的指针上。	
+
+(b) 合法。但是可能会有后续的程序错误。当 p1 被释放时，p1 所指向的对象也被释放，试图释放一个栈空间的对象。
+
+(c) 合法。当 p2 被释放时，p2所指向的对象也被释放，可能会使得 pi2 成为空悬指针。
+
+(d) 不合法。当 p3 被销毁时，它试图释放一个栈空间的对象。
+
+(e) 合法。
+
+(f) 不合法。p5 和 p2 指向同一个对象，当 p5 和 p2 被销毁时，会使得同一个指针被释放两次。
+
+
+
+## 练习12.18
+
+> shared_ptr 为什么没有 release 成员？
+
+release 成员的作用是放弃控制权并返回指针，因为在某一时刻只能有一个 unique_ptr 指向某个对象，unique_ptr 不能被赋值，所以要使用 release 成员将一个 unique_ptr 的指针的所有权传递给另一个 unique_ptr。而 shared_ptr 允许有多个 shared_ptr 指向同一个对象，因此不需要 release 成员。

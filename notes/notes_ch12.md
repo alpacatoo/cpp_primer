@@ -132,5 +132,25 @@
   - 不使用get函数初始化或reset另一个智能指针
   - 智能指针管理不是new分配的内存，记住传递删除器
 
+### 12.1.5 unique_ptr
 
+- `unique_ptr`独自拥有指向的对象
+- 定义`unique_ptr`时需要将其绑定到一个new返回的指针
+- 初始化unique_ptr必须采用**直接初始化**
+- 不支持普通的拷贝或赋值操作
+  - 不支持拷贝：`unique_ptr<string> p2(p1)`
+  - 不支持赋值：`p3 = p1`
+- 初始化
+  - `unique_ptr<T> u1`：空unique_ptr，可指向T类型的对象，u1使用delete释放指针
+  - `unique_ptr<T, D> u2`：空unique_ptr，可指向T类型的对象，使用类型为D的可调用对象释放指针
+  - `unique_ptr<T, D> u(d)`：空unique_ptr，指向T类型对象，使用类型为D的对象d代替delete
+- 通过release或reset将指针的是所有权从一个非const的unique_ptr转移到另一个unique_ptr
+- 不能拷贝的例外情况，
+  - 可以拷贝和赋值一个将要被销毁的`unique_ptr`
+  - 例如：函数返回一个`unique_ptr`；返回一个局部对象的拷贝
+  - 这里的拷贝是编译器特殊的拷贝
+- 向`unique_ptr`传递删除器
+  - 默认情况下，用delete释放它指向的对象
+  - 编译时绑定编译器
+  - 必须在尖括号中`unique_ptr`指向类型之后提供删除器类型
 

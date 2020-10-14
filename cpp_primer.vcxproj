@@ -15,7 +15,7 @@
     <ClInclude Include="ch01\Version_test.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ch12\ex12_15.cpp" />
+    <ClCompile Include="ch12\ex12_16.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{25F80045-EC55-4F0B-BFF5-BCDF551254A4}</ProjectGuid>
