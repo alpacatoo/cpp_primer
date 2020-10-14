@@ -118,5 +118,19 @@
     - 若传递了内置指针`q`，则令`p`指向`q`，否则会将`p`置为空
     - 若还传递了参数`d`，则会调用`d`而不是`delete`来释放`q`
 
+### 12.1.4 智能指针和异常
+
+- 智能指针能在发生异常且不能很好捕获异常时候，在代码块结束时释放动态内存
+- 有些类需要显式释放所使用的任何资源；通过智能指针实现
+  - connection在结束时候，需要disconnect函数释放资源
+  - 定义删除器函数：`void end_connection(connection * p) {disconnect(*p)}`
+  - 定义指针指针时传递删除器函数：`shared_ptr<connection> p (&c, end_connection)`
+  - 当指针指针`p`被销毁时，调用end_connection函数代替delete操作符，即调用disconnect函数释放connection资源
+- 智能指针注意事项
+  - 不使用相同内置指针初始化多个智能指针
+  - 不delete使用get函数返回的指针
+  - 不使用get函数初始化或reset另一个智能指针
+  - 智能指针管理不是new分配的内存，记住传递删除器
+
 
 

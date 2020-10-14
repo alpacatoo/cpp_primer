@@ -301,3 +301,95 @@ p是内置指针，且执行默认初始化；sp是智能指针，执行值初�
 
 
 
+## 练习12.14
+
+> 编写你自己版本的用 shared_ptr 管理 connection 的函数。
+
+```C++
+#include <iostream>
+#include <memory>
+#include <string>
+
+struct connection
+{
+    std::string ip;
+    int port;
+    connection(std::string i, int p) :ip(i), port(p){}
+};
+
+struct destination
+{
+    std::string ip;
+    int port;
+    destination(std::string i, int p) :ip(i), port(p){}
+};
+
+connection connect(destination *pd)
+{
+    std::shared_ptr<connection> pConn(new connection(pd->ip, pd->port));
+    std::cout << "creating connection(" << pConn.use_count() << ")" << std::endl;
+    std::cout << "creating connection object address: " << pConn.get() << std::endl;
+    return *pConn;
+}
+
+void disconnect(connection pConn)
+{
+    std::cout << "connection close(" << pConn.ip << ":" << pConn.port << ")" << std::endl;
+}
+
+void end_connection(connection* pConn)
+{
+    disconnect(*pConn);
+}
+
+void f(destination &d)
+{
+    connection conn = connect(&d);
+    std::cout << "object address: " << &conn << std::endl;
+    std::shared_ptr<connection> p(&conn, end_connection);
+    std::cout << "connecting now(" << p.use_count() << ")" << std::endl;
+}
+
+int main()
+{
+    destination dest("192.168.3.3", 8888);
+    f(dest);
+    return EXIT_SUCCESS;
+}
+```
+
+运行结果：
+
+> creating connection(1)
+> creating connection object address: 01618C70
+> object address: 012FF820
+> connecting now(1)
+> connection close(192.168.3.3:8888)
+> 请按任意键继续. . .
+
+
+
+## 练习12.15
+
+> 重写第一题的程序，用 lambda 代替end_connection 函数。
+
+删除end_connection函数，并将
+
+```C++
+std::shared_ptr<connection> p(&conn, end_connection);
+```
+
+替换为
+
+```C++
+std::shared_ptr<connection> p(&conn, [](connection* p){ disconnect(*p); });
+```
+
+运行结果：
+
+> creating connection(1)
+> creating connection object address: 01558E60
+> object address: 012FFD68
+> connecting now(1)
+> connection close(192.168.3.3:8888)
+> 请按任意键继续. . .
